@@ -4,15 +4,15 @@
 
 #### 部署jenkins
 
-    参考[Jenkins部署](jenkins.md)
+参考[Jenkins部署](jenkins.md)
 
 #### 部署nginx文件服务器
 
-    参考[nginx-file-server部署](nginx-file-server.md)
+参考[nginx-file-server部署](nginx-file-server.md)
 
 #### 部署gitlab
 
-    参考[Gitlab部署](gitlab.md)
+参考[Gitlab部署](gitlab.md)
 
 #### hmdm部署
 
