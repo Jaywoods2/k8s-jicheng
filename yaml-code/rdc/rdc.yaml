@@ -1,0 +1,62 @@
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: rdc
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rdc
+    spec:
+      containers:
+      - name: rdc
+        image: registry.saas.hand-china.com/rdchip/zentaopms
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 443
+        - containerPort: 80
+        env:
+        - name: mysql
+          value: db.mysql-mdm
+        volumeMounts:
+        - name: rdc-home
+          mountPath: /app/src/public/zentaopms/www/data
+        - name: rdc-home2
+          mountPath: /app/src/public/zentaopms/config/
+        - name: rdc-home3
+          mountPath: /etc/nginx/sites-enabled/
+      volumes:
+        - name: rdc-home
+          hostPath:
+            path: /zentaotmp/data
+        - name: rdc-home2
+          hostPath:
+            path: /zentaotmp/config
+        - name: rdc-home3
+          hostPath:
+            path: /zentaotmp/nginx
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+      app: rdc
+  name: rdc
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    protocol: TCP
+    name: https
+  selector:
+    app: rdc
+

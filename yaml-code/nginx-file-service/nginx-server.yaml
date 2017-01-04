@@ -1,0 +1,46 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: file-server
+  namespace: default
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: file-server
+      annotations:
+        scheduler.alpha.kubernetes.io/affinity: '{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["k8s-worker1"]}]}]}}}'
+        scheduler.alpha.kubernetes.io/tolerations: '[{"key":"dedicated","value":"master","effect":"NoSchedule"}]'
+    spec:
+      containers:
+      - name: file-server
+        image: nginxfileserver
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: file-server
+        volumeMounts:
+        - name: jenkins-file-store
+          mountPath: /var/jenkins_home
+      volumes:
+         - name: jenkins-file-store
+           hostPath:
+            path: /var/jenkins_home
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: file-server
+  name: file-server
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: file-server
